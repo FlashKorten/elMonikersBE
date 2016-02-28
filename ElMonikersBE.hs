@@ -8,7 +8,6 @@ import Data.Aeson
 import GHC.Generics
 import Servant
 import Control.Monad.Trans.Either
-import Control.Monad.IO.Class (liftIO)
 import Network.Wai
 import Network.Wai.Handler.Warp
 
@@ -22,11 +21,12 @@ data Card = Card
 instance ToJSON Card
 
 data Filter = Filter
-  { f1    :: String
+  { f1 :: String
   , f2 :: String
   } deriving (Eq, Show, Generic)
 
 instance ToJSON Filter
+instance FromJSON Filter
 
 filters :: String -> [Filter]
 filters _ =
@@ -51,8 +51,17 @@ filters _ =
   , Filter "Real" "Scientist"
   ]
 
-cards :: String -> [Card]
-cards _ =
+cards :: String -> Maybe Int -> [Filter] -> [Card]
+cards locale (Just n) filters        = take n $ cards locale Nothing filters
+cards locale Nothing  []             = baseCards
+cards locale Nothing  filters@(z:zs) = filter (f filters) baseCards
+     where f :: [Filter] -> Card -> Bool
+           f []     _ = False
+           f (x:xs) c | f1 x == genre c && f2 x == category c = True
+                      | otherwise                             = f xs c
+
+baseCards :: [Card]
+baseCards =
   [ Card "Real" "Scientist" "Heisenberg" "A German theoretical physicist, creator of the uncertainty principle, and winner of a Nobel Prize in Physics for his development of quantum mechanics. His name was also used as an alias for the meth manufacturer Walter White in the series Breaking Bad."
   , Card "Fictional" "Simpsons" "Comic Book Guy" "The overweight owner of The Android's Dungeon & Baseball Card Shop on The Simpsons. His character has a master's degree in foldlore mythology - he translated The Lord of the Rings into Klingon - and is known for his catchphrase ''Worst [blank] ever.''"
   , Card "Fictional" "AI" "Hal-9000" "The sentient computer from Stanley Kubrick's 2001: A Space Odyssey. Initially a helpful part of the ship, it eventually turns on the crew, killing Dr. Poole before being disconnected by Dave. As its mind goes, it sings ''Daisy Bell'' while pleading for its life."
@@ -82,18 +91,18 @@ cards _ =
   , Card "Real" "Artist" "Banksy" "The pseudonym of a mysterious UK graffiti artist. His work uses stencils to depict satirical characters, often interacting with the environment. Though nominated for an Academy Award as a documentary, his film Exit Through the Gift Shop is now widely accepted as a hoax."
   ]
 
-type API = "cards"   :> Capture "locale" String :> Get '[JSON] [Card]
+type API = "cards"   :> Capture "locale" String :> QueryParam "limit" Int :> ReqBody '[JSON] [Filter] :> Post '[JSON] [Card]
       :<|> "filters" :> Capture "locale" String :> Get '[JSON] [Filter]
 
 server :: Server API
 server = getCards
     :<|> getFilters
 
-    where getCards :: String -> EitherT ServantErr IO [Card]
-          getCards l = return (cards l)
+    where getCards :: String -> Maybe Int -> [Filter] -> EitherT ServantErr IO [Card]
+          getCards locale limit filter = return $ cards locale limit filter
 
           getFilters :: String -> EitherT ServantErr IO [Filter]
-          getFilters l = return (filters l)
+          getFilters l = return $ filters l
 
 main :: IO ()
 main = run 8081 $ serve myAPI server
