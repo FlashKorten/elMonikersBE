@@ -1,0 +1,40 @@
+name:                elMonikersBE
+version:             0.0.1
+synopsis:            Backend for elMonikers
+description:         Backend for elMonikers
+                     serving requested sets of cards per rest api as json
+homepage:            http://www.google.com/
+license:             OtherLicense
+license-file:        LICENSE
+author:              Sebastian Korten
+maintainer:          sebastian.korten@gmail.com
+-- copyright:
+category:            Web
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable ElMonikersBE
+  main-is: ElMonikersBE.hs
+  build-depends:
+      aeson >= 0.8
+    , base >= 4.7 && < 5
+    , bytestring
+    , directory
+    , either
+    , http-types
+    , js-jquery
+    , lucid
+    , random
+    , servant == 0.4.*
+    , servant-docs == 0.4.*
+    , servant-jquery == 0.4.*
+    , servant-lucid == 0.4.*
+    , servant-server == 0.4.*
+    , text
+    , time
+    , transformers
+    , wai
+    , warp
+  hs-source-dirs: .
+  default-language: Haskell2010
+
