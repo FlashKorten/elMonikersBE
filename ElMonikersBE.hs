@@ -5,7 +5,6 @@ module Main where
 
 import Servant
 import Control.Monad.Trans.Either
-import Network.Wai
 import Network.Wai.Handler.Warp
 import ElMonikersBE.Data (Card, Filter, cards, filters)
 
@@ -20,7 +19,7 @@ type API = "cards"   :> Capture "locale" String :> QueryParam "limit" Int :> Req
 server :: Server API
 server = getCards :<|> getFilters
    where getCards :: String -> Maybe Int -> [Filter] -> EitherT ServantErr IO [Card]
-         getCards locale limit filter = return $ cards locale limit filter
+         getCards locale limit fs = return $ cards locale limit fs
 
          getFilters :: String -> EitherT ServantErr IO [Filter]
          getFilters l = return $ filters l
