@@ -10,7 +10,7 @@ import Network.Wai.Handler.Warp
 import ElMonikersBE.Data (Card, Filter, cards, filters)
 
 --          http://server/cards/de?limit=20
---          with a list of _Filter_s in an 'application/json' RequestBody [[{"f1":true,"f2":"Musician","f3":"Pop"},{"f1":false,"f2":"SciFi","f3":"Monster"}]
+--          with a list of _Filter_s in an 'application/json' RequestBody [{"f1":true,"f2":"Musician","f3":"Pop"},{"f1":false,"f2":"SciFi","f3":"Monster"}]
 --       -> Serve up to 20 real pop musicians or fictional scifi monsters from the 'de' set of cards as JSON
 type API = "cards"   :> Capture "locale" String :> QueryParam "limit" Int :> ReqBody '[JSON] [Filter] :> Post '[JSON] [Card]
 --          http://server/filters/en
