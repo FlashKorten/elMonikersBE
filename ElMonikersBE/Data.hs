@@ -15,9 +15,9 @@ data Card = Card
 instance ToJSON Card
 
 data Filter = Filter
-  { f1 :: Bool
-  , f2 :: String
-  , f3 :: String
+  { filterReal :: Bool
+  , filterGenre :: String
+  , filterCategory :: String
   } deriving (Eq, Show, Generic)
 
 instance ToJSON Filter
@@ -29,7 +29,7 @@ cards locale Nothing  [] = baseCards
 cards locale Nothing  fs = filter (f fs) baseCards
      where f :: [Filter] -> Card -> Bool
            f []     _ = False
-           f (x:xs) c | f1 x == real c && f2 x == genre c && f3 x == category c = True
+           f (x:xs) c | filterReal x == real c && filterGenre x == genre c && filterCategory x == category c = True
                       | otherwise                                               = f xs c
 
 cardExample :: Card
