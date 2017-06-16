@@ -13,6 +13,7 @@ ghc-options:
 - -O2
 - -Wall
 - -funbox-strict-fields
+- -Worphans
 dependencies:
 - aeson >=0.8
 - base ==4.*

@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
-module ElMonikersBE.Data (Card, Filter, cards,filters) where
+module ElMonikersBE.Data (Card, cards, cardExample, Filter, filters, filterExample) where
 
 import Data.Aeson
 import GHC.Generics
@@ -24,13 +24,16 @@ instance ToJSON Filter
 instance FromJSON Filter
 
 cards :: String -> Maybe Int -> [Filter] -> [Card]
-cards locale (Just n) filters        = take n $ cards locale Nothing filters
-cards locale Nothing  []             = baseCards
-cards locale Nothing  filters@(z:zs) = filter (f filters) baseCards
+cards locale (Just n) fs = take n $ cards locale Nothing fs
+cards locale Nothing  [] = baseCards
+cards locale Nothing  fs = filter (f fs) baseCards
      where f :: [Filter] -> Card -> Bool
            f []     _ = False
            f (x:xs) c | f1 x == real c && f2 x == genre c && f3 x == category c = True
                       | otherwise                                               = f xs c
+
+cardExample :: Card
+cardExample = Card False "SciFi" "Monster" "The Alien from Alien" "The extraterrestrial from a famous action-horror film series. Sometimes referred to as a Xenomorph, these creatures are organized around a single queen, which gives birth to creatures that follow a lifecycle from egg to facehugger to chestburster to adult."
 
 baseCards :: [Card]
 baseCards =
@@ -62,6 +65,9 @@ baseCards =
   , Card False "Cartoons" "Villains" "Skeletor" "The main villain in the Masters of the Universe fantasy world. He is the arch nemesis of He-Man and is typically shown with a blue humanoid body, bare skull, and purple hood. His goal is to learn the secrets of Castle Grayskull and use them to conquer the land of Eternia."
   , Card True "Artist" "Unknown" "Banksy" "The pseudonym of a mysterious UK graffiti artist. His work uses stencils to depict satirical characters, often interacting with the environment. Though nominated for an Academy Award as a documentary, his film Exit Through the Gift Shop is now widely accepted as a hoax."
   ]
+
+filterExample :: Filter
+filterExample = Filter False "SciFi" "Monster"
 
 filters :: String -> [Filter]
 filters _ =
