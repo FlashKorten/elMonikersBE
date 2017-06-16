@@ -24,7 +24,7 @@ type RestApi = "cards"   :> Capture "locale" String :> QueryParam "limit" Int :>
       :<|> "filters" :> Capture "locale" String :> Get '[JSON] [Filter]
 --          http://server/api
 --       -> serve jquery client functions as plain text
-      :<|> "api" :> Get '[JSON, PlainText] Text
+      :<|> "api" :> QueryFlag "useAngular" :> Get '[JSON, PlainText] Text
 --          http://server/docs
 --       -> serve documentation of api as markdown
       :<|> "docs" :> Get '[JSON] Text
@@ -40,8 +40,10 @@ server = getCards :<|> getFilters :<|> getApi :<|> getDocs :<|> getStatus
          getFilters :: String -> Handler [Filter]
          getFilters l = return $ filters l
 
-         getApi :: Handler Text
-         getApi = return $ jsForAPI myRestApi jquery
+         getApi :: Bool -> Handler Text
+         getApi useAngular | useAngular = prepare $ angular defAngularOptions
+                           | otherwise  = prepare jquery
+                           where prepare = return . jsForAPI myRestApi
 
          getDocs :: Handler Text
          getDocs = (return . pack . markdown . docs) myRestApi
@@ -76,6 +78,9 @@ instance ToParam (QueryParam "limit" Int) where
 
 instance ToParam (QueryFlag "lie") where
   toParam _ = DocQueryParam "lie" ["lie"] "server should lie about status" Flag
+
+instance ToParam (QueryFlag "useAngular") where
+  toParam _ = DocQueryParam "useAngular" ["useAngular"] "prepare client js in angular (instead of jquery)" Flag
 
 instance ToSample Text where
   toSamples _ = singleSample $ pack "Api-Documentation in markdown"
