@@ -1,0 +1,40 @@
+name: elMonikersBE
+version: '0.0.1'
+synopsis: Backend for elMonikers
+description: ! 'Backend for elMonikers
+
+  serving requested sets of cards per rest api as json'
+category: Web
+author: Sebastian Korten
+maintainer: sebastian.korten@gmail.com
+license: OtherLicense
+homepage: http://www.google.com/
+ghc-options:
+- -O2
+- -Wall
+- -funbox-strict-fields
+dependencies:
+- aeson >=0.8
+- base ==4.*
+- bytestring
+- directory
+- either
+- http-types
+- js-jquery
+- lucid
+- random
+- servant ==0.10.*
+- servant-server ==0.10.*
+- servant-client ==0.10.*
+- servant-docs ==0.10.*
+- servant-js >=0.9 && <0.10
+- text
+- time
+- transformers
+- wai
+- wai-logger
+- warp
+executables:
+  ElMonikersBE:
+    main: ElMonikersBE.hs
+    source-dirs: ./.
